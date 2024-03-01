@@ -1,0 +1,58 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/intelFPGA/18.1/temalab
+vtb_uart
+Z0 DXx6 sv_std 3 std 0 22 AD7iAPLo6nTIKk<N0eo=D3
+!s110 1709119695
+!i10b 1
+!s100 =5cd4g0ENO:_N;[>;>fW_3
+ICf1VjhY_iDVkEo5TgN7zU3
+Z1 VDg1SIo80bB@j0V0VzS_@n1
+!s105 tb_uart_sv_unit
+S1
+Z2 dC:/Users/Lenovo/project
+w1709060980
+8C:/Users/Lenovo/project/test/tb_uart.sv
+FC:/Users/Lenovo/project/test/tb_uart.sv
+L0 3
+Z3 OV;L;10.5b;63
+r1
+!s85 0
+31
+!s108 1709119695.000000
+!s107 C:/Users/Lenovo/project/test/tb_uart.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/Lenovo/project/test/tb_uart.sv|
+!i113 1
+Z4 o-work work -sv
+Z5 tCvgOpt 0
+vuart
+R0
+!s110 1709119696
+!i10b 1
+!s100 <mAnW5ggY]ARI=hF0dPm_2
+ILmEV]:?3^:KWNB=PME_[W2
+R1
+!s105 uart_sv_unit
+S1
+R2
+w1698680001
+8C:/Users/Lenovo/project/rtl/uart.sv
+FC:/Users/Lenovo/project/rtl/uart.sv
+L0 24
+R3
+r1
+!s85 0
+31
+!s108 1709119696.000000
+!s107 C:/Users/Lenovo/project/rtl/uart.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/Lenovo/project/rtl/uart.sv|
+!i113 1
+R4
+R5
