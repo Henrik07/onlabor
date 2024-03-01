@@ -23,7 +23,11 @@ if [catch {set last_compile_time}] {
 }
 set last_compile_time $time_now
 
-vsim -i test_lib.tb_uart -do wave.do
+vsim -gui test_lib.tb_uart -do wave.do
+#nem nyitja meg modelsim gui-t?
+
+#modelsim test_lib.tb_uart
+#ezesetben viszont megall itt a do file
 
 run -all
 
