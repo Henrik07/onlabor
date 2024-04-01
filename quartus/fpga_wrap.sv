@@ -4,7 +4,7 @@ module fpga_wrap(
     input rx, // Incoming serial line
     output tx, // Outgoing serial line
     output [7:0] led_g, // Byte received
-	 output led_r
+    output led_r
 );
 
     design_top i_design_top(
@@ -13,7 +13,7 @@ module fpga_wrap(
         .rx(rx),
         .tx(tx),
         .rx_byte(led_g),
-		  .debug_output(led_r)
+	.debug_output(led_r)
     );
 	 
 endmodule
