@@ -17,8 +17,6 @@ localparam [2:0]
 logic [7:0] reg_array [0:127]; //128db 8 bites regiszter
 integer i;
 
-//logic cs [6:0];
-
 logic [2:0] next_state = IDLE;
 
 	always_comb begin
@@ -45,34 +43,5 @@ logic [2:0] next_state = IDLE;
 			reg_array[address] <= reg_array[address];
 		end
 	end
-	
-	/*always_ff @(posedge clk, negedge rst) begin
-		if (!rst_n) begin
-			next_state <= IDLE;
-		end
-		case (next_state)
-			IDLE: begin
-				if (wr) begin
-					next_state <= WRITE;
-				end
-				else begin
-					next_state <= READ;
-				end
-			end
-			WRITE: begin
-				if (data_received) begin
-					reg_array[address] <= data_in;
-					next_state <= IDLE;
-				end
-			end
-			READ: begin
-				if (cs[address]) begin
-					data_valid <= 1;
-					data_out <= reg_array[address];
-					next_state <= IDLE;
-				end
-			end
-		endcase
-	end*/
 		
 endmodule
