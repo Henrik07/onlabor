@@ -34,9 +34,6 @@ logic ready;
 
 assign ready = next_state == IDLE;
 
-//assign data_valid = read_received;
-//assign write_valid = data_received;
-
 	always_comb begin
 		data_valid = read_received;
 		write_valid = data_received;
@@ -51,13 +48,10 @@ assign ready = next_state == IDLE;
 
 	always_ff @(posedge clk, negedge rst_n) begin
 		if (!rst_n) begin
-			//wr <= 0; //READ
-			//address <= 7'b0;
 			next_state <= IDLE;
 		end
 		case (next_state)
 			IDLE: begin
-				//write_valid <= 0;
 				wr_latch <= wr;
 				address_latch <= wr;
 				if (wr) begin
