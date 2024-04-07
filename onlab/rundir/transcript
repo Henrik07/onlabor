@@ -1,0 +1,28 @@
+# Reading C:/intelFPGA/18.1/modelsim_ase/tcl/vsim/pref.tcl
+# vsim -gui -novopt "+nowarnTSCALE" -t 1ps -Lf modules_lib -Lf test_lib test_lib.tb_uart -do "henrik.tcl" -do "wave.do" 
+# Start time: 16:27:33 on Mar 23,2024
+# Loading sv_std.std
+# Loading test_lib.tb_uart
+# Loading modules_lib.uart
+# do henrik.tcl
+# do wave.do
+# ** Warning: (vsim-WLF-5000) WLF file currently in use: vsim.wlf
+#           File in use by: Lenovo  Hostname: LAPTOP-KLR96DRB  ProcessID: 24976
+#           Attempting to use alternate WLF file "./wlftgz2ws1".
+# ** Warning: (vsim-WLF-5001) Could not open WLF file: vsim.wlf
+#           Using alternate file: ./wlftgz2ws1
+run 6ms
+# test pass - value ok
+# test pass - bit time ok
+# test pass - value ok
+# test pass - bit time ok
+# test pass - value ok
+# test pass - bit time ok
+# test pass - value ok
+# test pass - bit time ok
+# test pass - value ok
+# test pass - bit time ok
+# test pass - value ok
+# test pass - bit time ok
+# End time: 16:29:24 on Mar 23,2024, Elapsed time: 0:01:51
+# Errors: 0, Warnings: 2
