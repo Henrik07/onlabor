@@ -13,7 +13,7 @@ module cmd_int(
 	output wr_o,
 	output [6:0] address_o,
 	
-	input read_received_i,
+	//input read_received_i,
 	input [7:0] read_data_i,
 	
 	output write_valid_o,
@@ -27,49 +27,56 @@ module cmd_int(
 
 typedef enum {IDLE, WRITE, READ} cmd_state_e;
 	
-logic data_valid_d, data_valid_q;
-logic write_valid_d, write_valid_q;
+//logic data_valid_d, data_valid_q;
+//logic write_valid_d, write_valid_q;
+logic [7:0] write_data_d, write_data_q;
+logic [7:0] data_d, data_q;
 logic wr_d, wr_q;
 logic [6:0] address_d, address_q;
 
 cmd_state_e cmd_state_d, cmd_state_q;
 
-logic ready;
+logic address_ready;
 
-assign ready = (cmd_state_q == IDLE);
+assign address_ready = (cmd_state_q == IDLE) & data_received_i;
 
 	always_comb begin
-		data_valid_d = read_received;
-		write_valid_d = data_received;
+		//data_valid_d = read_received_i;
+		//write_valid_d = data_received_i;
 		wr_d = wr_q;
 		address_d = address_q;
 		cmd_state_d = cmd_state_q;
-		write_data_o = 8'b0;
-		data_o = 8'b0;
-		if (ready && data_received) begin
+		write_data_d = write_data_q;
+		data_d = data_q;
+/*		if (ready && data_received) begin
 			write_valid_d = 0;
 			wr_d = data_i[7];
 			address_d = data_i[6:0];
-		end
+		end*/
 		case (cmd_state_q)
 			IDLE: begin
 				//write_valid <= 0;
-				if (wr_o) begin
-					cmd_state_d = WRITE;
-				end
-				else begin
-					cmd_state_d = READ;
+				if (data_received_i) begin
+					//write_valid_d = 0;
+					wr_d = data_i[7];
+					address_d = data_i[6:0];
+					if (data_i[7]) begin
+						cmd_state_d = WRITE;
+					end
+					else begin
+						cmd_state_d = READ;
+					end
 				end
 			end
 			WRITE: begin
-				if (write_valid_o) begin
-					write_data_o = data_i;
+				if (data_received_i) begin
+					write_data_d = data_i;
 					cmd_state_d = IDLE;
 				end
 			end
 			READ: begin
-				if (read_received_i) begin
-					data_o = read_data_i;
+				if (data_valid_o) begin
+					data_d = read_data_i;
 					cmd_state_d = IDLE;
 				end
 			end
@@ -83,23 +90,29 @@ assign ready = (cmd_state_q == IDLE);
 		if (!rst_n_i) begin
 			wr_q <= 0; //READ
 			address_q <= 7'b0;
-			data_valid_q <= 0;
-			write_valid_q <= 0;
+			write_data_q <= 8'b0;
+			data_q <= 8'b0;
+			//data_valid_q <= 0;
+			//write_valid_q <= 0;
 			cmd_state_q <= IDLE;
 		end
 		else begin
-			if (ready) begin
+			if (address_ready) begin
 				wr_q <= wr_d;
 				address_q <= address_d;
 			end
-			data_valid_q <= data_valid_d;
-			write_valid_q <= write_valid_d;
+			write_data_q <= write_data_d;
+			data_q <= data_d;
+			//data_valid_q <= data_valid_d;
+			//write_valid_q <= write_valid_d;
 			cmd_state_q <= cmd_state_d;
 		end
 	end
 	
-	assign data_valid_o = data_valid_q;
-	assign write_valid_o = write_valid_q;
+	assign write_data_o = write_data_q;
+	assign data_o = data_q;
+	assign data_valid_o = address_ready; //data_valid_q;
+	assign write_valid_o = (cmd_state_q == WRITE) & data_received_i; //write_valid_q;
 	assign wr_o = wr_q;
 	assign address_o = address_q;
 
