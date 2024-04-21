@@ -4,7 +4,7 @@ module design_top(
     input rx_i, // Incoming serial line
     output tx_o, // Outgoing serial line
     output [7:0] rx_byte_o, // Byte received
-	 output debug_o
+	output debug_o
 );
 
 //uart
@@ -20,27 +20,27 @@ logic [7:0] rx_byte_internal;
 logic [7:0] rx_store_q, rx_store_d;
 
 //cmd_int
-logic clk_i_cmd;
-logic rst_n_i_cmd;
-logic received_i_cmd;
-logic [7:0] data_i_cmd;
-logic data_valid_o_cmd;
-logic [7:0] data_o_cmd;
-logic [7:0] read_data_i_cmd;
-logic write_valid_o_cmd;
-logic [7:0] write_data_o_cmd;
-logic [6:0] address_o_cmd;
-logic wr_o_cmd;
+logic clk_cmd;
+logic rst_n_cmd;
+logic received_cmd;
+logic [7:0] data_in_cmd;
+logic data_valid_cmd;
+logic [7:0] data_out_cmd;
+logic [7:0] read_data_cmd;
+logic write_valid_cmd;
+logic [7:0] write_data_cmd;
+logic [6:0] address_cmd;
+logic wr_cmd;
 
 
 //reg_top
-logic clk_i_reg;
-logic rst_n_i_reg;
-logic [7:0] data_received_i_reg;
-logic [7:0] data_i_reg;
-logic [7:0] data_o_reg;
-logic [6:0] address_i_reg;
-logic wr_i_reg;
+logic clk_reg;
+logic rst_n_reg;
+logic [7:0] data_received_reg;
+logic [7:0] data_in_reg;
+logic [7:0] data_out_reg;
+logic [6:0] address_reg;
+logic wr_reg;
 
 
 //debug
@@ -69,18 +69,18 @@ logic [7:0]	debug_q,debug_d;
 		end
 	 end
 	
-	assign transmit = data_valid_o_cmd;
-	assign tx_byte = data_o_cmd;
+	assign transmit = data_valid_cmd;
+	assign tx_byte = data_out_cmd;
 	
    uart i_uart(
        .clk(clk_i),
        .rst(rst_n_i),
        .rx(rx_i),
        .tx(tx_o),
-       .transmit(transmit),//received_q),				// <- cmd_int: data_valid
-       .tx_byte(tx_byte),//rx_store_q),					// <- cmd_int: data_out
-       .received(received),					// -> cmd_int: data_received
-       .rx_byte(rx_byte_internal),			// -> cmd_int: data_in
+       .transmit(transmit),//received_q),		// <- cmd_int: data_valid
+       .tx_byte(tx_byte),//rx_store_q),		// <- cmd_int: data_out
+       .received(received),						// -> cmd_int: data_received
+       .rx_byte(rx_byte_internal),				// -> cmd_int: data_in
        .is_receiving(is_receiving),
        .is_transmitting(is_transmitting),
        .recv_error(recv_error)
@@ -90,44 +90,42 @@ logic [7:0]	debug_q,debug_d;
 	assign rx_byte 		= rx_store_q;
 	assign debug_output = debug_q;
 	
-	assign clk_i_cmd = clk_i;
-	assign rst_n_i_cmd = rst_n_i;
-	assign received_i_cmd = received;
-	assign data_i_cmd = rx_byte_internal;
-	assign read_data_i_cmd = data_o_reg;
+	assign clk_cmd = clk_i;
+	assign rst_n_cmd = rst_n_i;
+	assign received_cmd = received;
+	assign data_in_cmd = rx_byte_internal;
+	assign read_data_cmd = data_out_reg;
 	 
 	 
 	cmd_int i_cmd_int(
-		 .clk_i(clk_i_cmd),//clk_i),
-       .rst_n_i(rst_n_i_cmd),//rst_n_i),
-		 .data_received_i(received_i_cmd),//received), 		// <- uart: received
-       .data_i(data_i_cmd),//rx_byte_internal),			// <- uart: rx_byte
-       .data_valid_o(data_valid_o_cmd),//received_q),			// -> uart: transmit
-       .data_o(data_o_cmd),//rx_byte_internal),			// -> uart: tx_byte
-		 //.read_received_i(read_received),	// <- reg_top: data_valid 
-       .read_data_i(read_data_i_cmd),//read_data),				// <- reg top: data_out
-		 .write_valid_o(write_valid_o_cmd),//write_valid),		// -> reg top: data_received
-		 .write_data_o(write_data_o_cmd),//write_data),			// -> reg top: data_in
-       .address_o(address_o_cmd),//address),					// -> reg top: address
-		 .wr_o(wr_o_cmd)//wr)									// -> reg top: wr
+		.clk_i(clk_cmd),//clk_i),
+        .rst_n_i(rst_n_cmd),//rst_n_i),
+		.data_received_i(received_cmd),//received), 		// <- uart: received
+        .data_i(data_in_cmd),//rx_byte_internal),				// <- uart: rx_byte
+        .data_valid_o(data_valid_cmd),//received_q),		// -> uart: transmit
+        .data_o(data_out_cmd),//rx_byte_internal),				// -> uart: tx_byte
+        .read_data_i(read_data_cmd),//read_data),			// <- reg top: data_out
+		.write_valid_o(write_valid_cmd),//write_valid),	// -> reg top: data_received
+		.write_data_o(write_data_cmd),//write_data),		// -> reg top: data_in
+        .address_o(address_cmd),//address),					// -> reg top: address
+		.wr_o(wr_cmd)//wr)										// -> reg top: wr
 	);
 	 
-	assign clk_i_reg = clk_i;
-	assign rst_n_i_reg = rst_n_i;
-	assign data_received_i_reg = write_valid_o_cmd;
-	assign data_i_reg = write_data_o_cmd;
-	assign address_i_reg = address_o_cmd;
-	assign wr_i_reg = wr_o_cmd;
+	assign clk_reg = clk_i;
+	assign rst_n_reg = rst_n_i;
+	assign data_received_reg = write_valid_cmd;
+	assign data_in_reg = write_data_cmd;
+	assign address_reg = address_cmd;
+	assign wr_reg = wr_cmd;
 	 
 	reg_top i_reg_top(
-		 .clk_i(clk_i_reg),
-		 .rst_n_i(rst_n_i_reg),
-		 .data_received_i(data_received_i_reg),		// <- cmd_int: write_valid
-		 .data_i(data_i_reg),					// <- cmd_int: write_data
-	    //.data_valid_o(read_received),		// -> cmd_int: read_received 
-		 .data_o(data_o_reg),					// -> cmd_int: read_data
-		 .address_i(address_i_reg),					// <- cmd_int: address
-		 .wr_i(wr_i_reg)									// <- cmd_int: wr
+		 .clk_i(clk_reg),
+		 .rst_n_i(rst_n_reg),
+		 .data_received_i(data_received_reg),	// <- cmd_int: write_valid
+		 .data_i(data_in_reg),							// <- cmd_int: write_data
+		 .data_o(data_out_reg),							// -> cmd_int: read_data
+		 .address_i(address_reg),					// <- cmd_int: address
+		 .wr_i(wr_reg)									// <- cmd_int: wr
 	);
 	 
 endmodule
