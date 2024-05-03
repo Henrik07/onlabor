@@ -32,7 +32,10 @@ module uart(
     output [7:0] rx_byte, // Byte received
     output is_receiving, // Low when receive line is idle.
     output is_transmitting, // Low when transmit line is idle.
-    output recv_error // Indicates error in receiving packet.
+    output recv_error, // Indicates error in receiving packet.
+	input busy, // busy signal
+	input rts,	// terminal ready to send
+	output cts	// uart ready to receive -> terminal clear to send
     );
  
 parameter CLOCK_DIVIDE = 1302; // clock rate (50Mhz) / (baud rate (9600) * 4)
@@ -66,12 +69,14 @@ reg [1:0] tx_state = TX_IDLE;
 reg [5:0] tx_countdown;
 reg [3:0] tx_bits_remaining;
 reg [7:0] tx_data;
+
+assign cts = rts & !busy;
  
 assign received = recv_state == RX_RECEIVED;
 assign recv_error = recv_state == RX_ERROR;
 assign is_receiving = recv_state != RX_IDLE;
 assign rx_byte = rx_data;
- 
+
 assign tx = tx_out;
 assign is_transmitting = tx_state != TX_IDLE;
  

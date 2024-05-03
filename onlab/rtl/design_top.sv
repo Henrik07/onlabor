@@ -2,6 +2,7 @@ module design_top(
     input clk_i, // The master clock for this module
     input rst_n_i, // Synchronous reset.
     input rx_i, // Incoming serial line
+	input rts,
     output tx_o, // Outgoing serial line
     output [7:0] rx_byte_o, // Byte received
 	output debug_o
@@ -14,6 +15,9 @@ logic recv_error;
 logic received;
 logic transmit;
 logic [7:0] tx_byte;
+logic busy;
+//logic rts;
+logic cts;
 
 logic received_q, received_d;
 logic [7:0] rx_byte_internal;
@@ -24,8 +28,11 @@ logic clk_cmd;
 logic rst_n_cmd;
 logic received_cmd;
 logic [7:0] data_in_cmd;
+logic rx_active_cmd;
+logic tx_active_cmd;
 logic data_valid_cmd;
 logic [7:0] data_out_cmd;
+logic cmd_busy;
 logic [7:0] read_data_cmd;
 logic write_valid_cmd;
 logic [7:0] write_data_cmd;
@@ -71,6 +78,7 @@ logic [7:0]	debug_q,debug_d;
 	
 	assign transmit = data_valid_cmd;
 	assign tx_byte = data_out_cmd;
+	assign busy = cmd_busy;
 	
    uart i_uart(
        .clk(clk_i),
@@ -78,22 +86,27 @@ logic [7:0]	debug_q,debug_d;
        .rx(rx_i),
        .tx(tx_o),
        .transmit(transmit),//received_q),		// <- cmd_int: data_valid
-       .tx_byte(tx_byte),//rx_store_q),		// <- cmd_int: data_out
+       .tx_byte(tx_byte),//rx_store_q),			// <- cmd_int: data_out
        .received(received),						// -> cmd_int: data_received
        .rx_byte(rx_byte_internal),				// -> cmd_int: data_in
        .is_receiving(is_receiving),
        .is_transmitting(is_transmitting),
-       .recv_error(recv_error)
+       .recv_error(recv_error),
+	   .busy(busy),
+	   .rts(rts),
+	   .cts(cts)
    );
 	 
 	//assign received 		= received_q;
 	assign rx_byte 		= rx_store_q;
-	assign debug_output = debug_q;
+	//assign debug_output = debug_q;
 	
 	assign clk_cmd = clk_i;
 	assign rst_n_cmd = rst_n_i;
 	assign received_cmd = received;
 	assign data_in_cmd = rx_byte_internal;
+	assign rx_active_cmd = is_receiving;
+	assign tx_active_cmd = is_transmitting;
 	assign read_data_cmd = data_out_reg;
 	 
 	 
@@ -101,14 +114,17 @@ logic [7:0]	debug_q,debug_d;
 		.clk_i(clk_cmd),//clk_i),
         .rst_n_i(rst_n_cmd),//rst_n_i),
 		.data_received_i(received_cmd),//received), 		// <- uart: received
-        .data_i(data_in_cmd),//rx_byte_internal),				// <- uart: rx_byte
+        .data_i(data_in_cmd),//rx_byte_internal),			// <- uart: rx_byte
+		.rx_active_i(rx_active_cmd),
+		.tx_active_i(tx_active_cmd),
         .data_valid_o(data_valid_cmd),//received_q),		// -> uart: transmit
-        .data_o(data_out_cmd),//rx_byte_internal),				// -> uart: tx_byte
+        .data_o(data_out_cmd),//rx_byte_internal),			// -> uart: tx_byte
+		.cmd_busy_o(cmd_busy),							// -> uart: busy
         .read_data_i(read_data_cmd),//read_data),			// <- reg top: data_out
-		.write_valid_o(write_valid_cmd),//write_valid),	// -> reg top: data_received
+		//.write_valid_o(write_valid_cmd),//write_valid),		// -> reg top: data_received
 		.write_data_o(write_data_cmd),//write_data),		// -> reg top: data_in
         .address_o(address_cmd),//address),					// -> reg top: address
-		.wr_o(wr_cmd)//wr)										// -> reg top: wr
+		.wr_o(wr_cmd)//wr)									// -> reg top: wr
 	);
 	 
 	assign clk_reg = clk_i;
@@ -121,11 +137,13 @@ logic [7:0]	debug_q,debug_d;
 	reg_top i_reg_top(
 		 .clk_i(clk_reg),
 		 .rst_n_i(rst_n_reg),
-		 .data_received_i(data_received_reg),	// <- cmd_int: write_valid
+		 //.data_received_i(data_received_reg),			// <- cmd_int: write_valid
 		 .data_i(data_in_reg),							// <- cmd_int: write_data
 		 .data_o(data_out_reg),							// -> cmd_int: read_data
-		 .address_i(address_reg),					// <- cmd_int: address
+		 .address_i(address_reg),						// <- cmd_int: address
 		 .wr_i(wr_reg)									// <- cmd_int: wr
 	);
 	 
+	assign debug_o = cts;//cmd_busy;
+	
 endmodule
